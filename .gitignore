@@ -2,7 +2,6 @@
 node_modules/
 .idea
 .vs
-local_settings.py
 images/
 test.py
 Procfile
