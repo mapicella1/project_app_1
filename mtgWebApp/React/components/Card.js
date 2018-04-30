@@ -75,10 +75,10 @@ class Card extends Component {
             this.snack.setSnack("showNoDeck", "Please choose a deck");
         }
         else {
-            callBackend('../api/addCard/' + this.state.deckId + '/' + this.state.card.card_id)
+            callBackend(`../api/addCard/${this.state.deckId}/${this.state.card.card_id}`)
                 .then((data) => {
-                    var card = this.state.card.card_name;
-                    var deck = this.state.showing;
+                    let card = this.state.card.card_name;
+                    let deck = this.state.showing;
 
                     // notify that card has been added if not already in selected deck
                     if (data == true) {
@@ -91,24 +91,24 @@ class Card extends Component {
         }
     }
 
+    // regex for findings characters that need removal for file match
     static defaultProps = {
-        regex: /[{](\w+\s*)+[}]/g,
-        regex2: /,(?=[\w])/g,
-        regex3: /"/g,
+        manaReg: /[{](\w+\s*)+[}]/g,
+        allSetReg: /,(?=[\w])/g,
+        quoteReg: /"/g,
     }
 
+    // ajax fetch for transformation/linked card id
     getOtherCard = (name, type) => {
-        callBackend('../api/getCardName/?card_name=' + name)
+        callBackend(`../api/getCardName/?card_name=${name}`)
             .then(data => {
-                if (type == 'trans') {
-                    this.setState({ trans: data[0].card_id })
-                }
-                else {
-                    this.setState({ linked: data[0].card_id })
-                }
+                (type == 'trans') 
+                    ? (this.setState({ trans: data[0].card_id }))
+                    : (this.setState({ linked: data[0].card_id }))
             });
     }
 
+    // sets user deck to add card to
     setDeck = (name, id) => {
         this.setState({
             showing: name,
@@ -116,50 +116,58 @@ class Card extends Component {
         });
     }
 
-    getList(key, card) {
+    // check displayed attributes of card and create necessary dom elements
+    getList(key, value) {
         let array = []
-        let rarity = this.state.card.rarity;
+        let { card, trans, linked } = this.state;
+        let { manaReg, allSetReg, quoteReg } = this.props;
+        let rarity = card.rarity;
         if (key == 'mana_cost') {
-            card.match(this.props.regex).map((match) => {
-                array.push(<img key={shortid.generate()} className="cardListImage"
-                    src={`${BucketLink}/Symbol/${match.slice(1, -1)}.jpg`} alt={match} />)
+            // match {mana} identifier in mana cost ans replace with image symbol
+            array = value.match(manaReg).map((match) => {
+                return (<img key={shortid.generate()} className="cardListImage"
+                    src={`${BucketLink}/Symbol/${match.slice(1, -1)}.jpg`} alt={match} />);
             })
         }
         else if (key == 'card_text') {
-            card.split('|').map((el) => {
-                array.push(<span key={shortid.generate()} >{getReg(el)}<br/></span>)
+            // split rules text at '|' and send to getReg for formatting
+            array = value.split('|').map((el) => {
+                return <span key={shortid.generate()} >{getReg(el)}<br /></span>;
             })
         }
         else if (key == 'all_sets') {
-            let sets = card.slice(0, -1).split(this.props.regex2)
-            sets.map((set, index) => {
-                set = set.replace(this.props.regex3, '')
-                array.push(<img key={shortid.generate()} className="cardListImage"
-                    src={`${BuckLink}/Set/${set.replace(':', '')}.jpg`} alt={set} />)
+            // split sets into array, remove necessary characters, replace with set image
+            let sets = value.slice(0, -1).split(allSetReg)
+            array = sets.map((set, index) => {
+                set = set.replace(quoteReg, '');
+                return (<img key={shortid.generate()} className="cardListImage"
+                    src={`${BucketLink}/Set/${set.replace(':', '')}.jpg`} alt={set} />);
             })
         }
         else if (key == 'flavor_text') {
-            array.push(<i key={shortid.generate()} >{card}</i>)
+            array.push(<i key={shortid.generate()} >{value}</i>)
         }
         else if (key == 'p') {
-            array.push(<span key={shortid.generate()} >{card.trim() + "/" + this.state.card.t.trim()}</span>)
+            array.push(<span key={shortid.generate()} >{`${value.trim()}/${crd.t.trim()}`}</span>)
         }
         else if (key == 'expansion') {
-            if (this.state.card.rarity == 'Basic Land') {
+            // replace 'Basic Land' rarity with 'Land' for correct image name match
+            if (rarity == 'Basic Land') {
                 rarity = 'Land';
             }
-            let symbol = card.replace(':', '') + " (" + rarity + ")";
-            array.push(<img key={shortid.generate()} className="cardListImage" src={`${BucketLink}/Set/${symbol}.jpg`} alt={symbol} />)
-            array.push(<span key={shortid.generate()} >&nbsp;{card}</span>)
+            let symbol = `${value.replace(':', '')} (${rarity})`;
+            array.push(<img key={shortid.generate()} className="cardListImage"
+                src={`${BucketLink}/Set/${symbol}.jpg`} alt={symbol} />);
+            array.push(<span key={shortid.generate()} >&nbsp;{value}</span>);
         }
         else if (key == 'trans_card') {
-            array.push(<a href={"/card/" + this.state.trans}>{card}</a>)
+            array.push(<a href={`/card/${trans}`}>{value}</a>);
         }
         else if (key == 'linked_card') {
-            array.push(<a href={"/card/" + this.state.linked}>{card}</a>)
+            array.push(<a href={`/card/${linked}`}>{value}</a>);
         }
         else {
-            return <li>{card}</li>
+            return <li>{value}</li>
         }
 
         return (
@@ -167,31 +175,43 @@ class Card extends Component {
         )
     }
 
+    // build table to display formats that card is banned/legal in
     getLegality(card) {
-        let legal = [];
-        Object.keys(card).map((key) => {
+        let legal = Object.keys(card).map((key) => {
             if (card[key] == 'Legal' || card[key] == 'Banned' || card[key] == 'Restricted') {
-                legal.push(
-                    <tr key={shortid.generate()} >
-                        <td style={{ textTransform: 'capitalize' }}>{key}</td>
-                        <td>{card[key]}</td>
-                    </tr>
-                )
+                return (
+                        <tr key={shortid.generate()} >
+                            <td style={{ textTransform: 'capitalize' }}>{key}</td>
+                            <td>{card[key]}</td>
+                        </tr>
+                );
             }
         })
         return legal;
     }
 
+    // check current card attribute for values not to be displayed in main list
+    checkAtt = (card, key) => {
+        let notLegal = (key != 'card_id'
+                && card[key] != 'Legal'
+                && card[key] != 'Banned'
+                && card[key] != 'Restricted'
+                && key != 't')
+            ? (true)
+            : (false)
+        return notLegal;
+    }
+
     render() {
-        console.log(this.state.card.card_name)
+        let { card, isUser, showing, deckData } = this.state;
         return (
             <div>
-                {(this.state.card.card_name) && ( 
+                {(card.card_name) && ( 
                     <div className="cardGrid">
                     <div className="imageButtons">
-                            <img src={`${BucketLink}/Card/${getCardName(this.state.card.card_name)}.jpg`}
-                                alt={this.state.card.card_name} />
-                        {(this.state.isUser) && (
+                            <img src={`${BucketLink}/Card/${getCardName(card.card_name)}.jpg`}
+                                alt={card.card_name} />
+                        {(isUser) && ( // render buttons if user is logged in
                             <div id="buttons">
                                 <button id="addButton" className="btn btn-primary" onClick={() => { this.addCard() }}>
                                     Add To Collection
@@ -199,13 +219,17 @@ class Card extends Component {
                                 <a className="nav-link dropdown-toggle btn btn-dark" href="javascript:void(0)"
                                     id="dropDownShow" data-toggle="dropdown"
                                     aria-haspopup="true" aria-expanded="false">
-                                    {this.state.showing}
+                                    {showing}
                                 </a>
                                 <div className="dropdown-menu" id="deckDrop" aria-labelledby="navbarDropdownMenuLink">
                                     <div id="deckMenuItems">
                                         <a className="dropdown-item" href="javascript:void(0)" onClick={() => { this.setDeck('Shoe Box', 0) }}> Shoe Box</a>
-                                        {this.state.deckData.map((deck) => (
-                                            <a key={shortid.generate()}  className="dropdown-item" onClick={() => { this.setDeck(deck.deck_name, deck.deck_id) }} href="javascript:void(0)" >{deck.deck_name}</a>
+                                        {deckData.map((deck) => ( // populate dropdown with user's decks
+                                                <a key={shortid.generate()} className="dropdown-item"
+                                                    onClick={() => { this.setDeck(deck.deck_name, deck.deck_id) }}
+                                                    href="javascript:void(0)" >
+                                                    {deck.deck_name}
+                                                </a>
                                         ))}
                                     </div>
                                 </div>
@@ -213,21 +237,18 @@ class Card extends Component {
                         )}
                     </div>
                     <div>
-                        {Object.keys(this.state.card).map((key) => (
-                            (this.state.card[key] != null && key != 'card_id'
-                                && this.state.card[key] != 'Legal'
-                                && this.state.card[key] != 'Banned'
-                                && this.state.card[key] != 'Restricted'
-                                && key != 't') && (
+                        {// map card attributes, skip attributes that are null or match in checkAtt
+                        Object.keys(card).map((key) => (
+                            (card[key] != null && this.checkAtt(card, key))) && (
                                 <div key={shortid.generate()} className="cardRow">
-                                    {(key == 'p')
+                                    {(key == 'p') // format power and toughness header for proper display
                                     ? (<div className="card_header"><strong>P/T: </strong></div>)
                                     : (<div className="card_header"><strong>{key.split('_').join(' ') + ": "}</strong></div>)}
                                     <div className="cardDets">
-                                        {this.getList(key, this.state.card[key])}
+                                        {this.getList(key, card[key])}
                                     </div>
                                 </div>
-                            )))}
+                            ))}
                         <table id="legalTable" className="table table-sm">
                             <thead>
                                 <tr>
@@ -236,7 +257,7 @@ class Card extends Component {
                                 </tr>
                             </thead>
                             <tbody>
-                                {this.getLegality(this.state.card)}
+                                {this.getLegality(card)}
                             </tbody>
                         </table>
                     </div>
