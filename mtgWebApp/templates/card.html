@@ -1,0 +1,32 @@
+{% extends 'MasterPage.html' %}
+{% load static %}
+{% load titlefy %}
+{% block content %}
+
+    <div class="cardCont">
+        <div class="leftColumn" id="cardPageImage">
+            <img src="{% get_static_prefix %}Card/{{ card.card_name }}.jpg" alt="{{card.card_name}}" />
+        </div>
+        <div class="rightColumn">
+            <table id="cardTable">{% for key, value in card.items %}
+                    <tr>
+                        {% if value and key != 'card_id' %}
+                            <th class="card_header">{{ key|titlefy }}: </th>
+                            <td>
+                                {% if key == 'mana_cost' or key == 'card_text_mana' %}
+                                    {% for item in value.split%}
+                                         <img src="{% get_static_prefix %}Symbol/{{ item }}.jpg" alt="{{ item }}" />
+                                    {% endfor %}
+
+                                {% else %}
+                                        {{value}}
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+{% endblock %}

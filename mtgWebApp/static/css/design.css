@@ -1,0 +1,442 @@
+button{
+    padding-top: 20px;
+    padding-left: 20px
+}
+
+body {
+    min-width:1055px;
+}
+
+li{
+    list-style-type:none;
+    margin:auto;
+}
+
+#bootstrap-overrides {
+    width:100%;
+    float:right;
+}
+
+#bootstrap-overrides li{
+    margin-left: auto;
+    margin-right auto;
+}
+
+.logo {
+    float:left;
+}
+
+#nav-override {
+    max-width:1055px;
+    min-width:1050px;
+}
+
+#navbarDropdownMenuLink{
+    padding: 10px;
+}
+
+#master{
+height: 100%;
+    overflow:hidden;
+    clear:both;
+}
+
+.container{
+    clear:both;
+}
+
+.cardCont{
+    display:block;
+    clear:both;
+    overflow:hidden;
+}
+
+.cardImage:hover .searchImage{
+    opacity: 0.3;
+}
+
+.cardImage:hover .middle{
+    opacity: 1;
+}
+
+.cardImage{
+  width:100%
+  opacity: 1;
+  transition: .5s ease;
+  padding: 7px 7px 7px 7px;
+}
+
+.left_card_container{
+  position: relative;
+  float:right;
+  width: 100%;
+ }
+
+#userCardInner{
+    width:367;
+    border-radius: 5px;
+    z-index: 25;
+    box-shadow: 10px 10px 5px grey;
+    left:64%;
+    position: absolute;
+}
+
+#userCardInner.floating{
+    position: fixed;
+}
+
+.page {
+    color: black;
+}
+
+.advSearch{
+    clear:both;
+}
+
+table, th, td {
+    border-collapse: collapse;
+}
+
+th, td {
+    padding: 5px;
+    text-align: left;
+}
+
+#cardRow{
+    height:0;
+    width:100%;
+}
+
+ul{
+    list-style-type:none;
+}
+
+.card_header{
+    text-align:right;
+    text-transform: capitalize;
+}
+
+#deckDrop{
+    width:230px;
+}
+
+#addButton{
+    width: 100%;
+    margin-bottom:15px;
+}
+
+.deckText {
+    width: 240px;
+    height: auto;
+}
+
+.deckColumns {
+    width:95%;
+    background-color: #d2d5e0;
+    border-radius: 10px;
+    padding: 10px 10px 10px 10px;
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.cardText{
+    max-width: 500px;
+    font-size: 14px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.imageColumn{
+    border: 1px solid black;
+    width: 20%;
+}
+
+.right_card_container{
+  position: relative;
+  float:right;
+  width: 45%;
+ }
+
+.deckPage{
+    width:600px;
+}
+
+ .card_image_container{
+  position: relative;
+  float:right;
+  width: 50%;
+ }
+
+ #deckDropdown{
+    float:right;
+    width:90%;
+ }
+
+ #deckMenuItems{
+    overflow-y:scroll;
+    height:160px;
+ }
+
+.deckList {
+    position:relative;
+    overflow-y:scroll;
+    height:300px;
+}
+
+ .pages{
+    text-align: left;
+ }
+
+.searchImage {
+max-width: 150px;
+  opacity: 1;
+  transition: .5s ease;
+
+}
+
+.cardCount{
+    display: inline-block;
+    position:relative;
+    width:3em;
+}
+
+#cardModal{
+    width:70%
+    margin:auto;
+}
+
+
+.leftSearch{
+    width:50%;
+    float:left;
+}
+
+.leftSearch td{
+    width:100%;
+    text-align: center;
+}
+
+.leftSearch label{
+    text-align: left;
+}
+
+.rightSearch td{
+    margin-auto;
+    width:100%;
+    text-align: center;
+}
+
+#toggleButton {
+    margin-bottom: 5px;
+}
+
+.searchRow{
+    clear:both;
+}
+
+.paramText{
+    margin-left: 5px;
+}
+
+.deckChart {
+
+}
+
+.deckDough {
+
+}
+
+#userCardInner .chart {
+    position:absolute;
+    z-index: -5;
+    opacity: 0;
+}
+
+#userCardInner:hover .chart{
+    transform: translate(-130px, 75px);
+    -ms-transform: translate(-130px, 75px);
+    transition: .5s ease;
+    opacity: 1;
+    z-index:-1;
+}
+
+#userCardInner .doughChart {
+    position:absolute;
+
+    z-index: -5;
+    opacity: 0;
+}
+
+#userCardInner:hover .doughChart{
+    transform: translate(-45px, -70px);
+    -ms-transform: translate(-45px, -70px);
+    transition: .5s ease;
+    opacity: 1;
+    z-index:-1;
+}
+
+.deckImage {
+    position:absolute;
+    z-index:200;
+}
+
+.cardShift {
+    position: fixed;
+    bottom: 0;
+    z-index:200;
+}
+.cardShift {
+    position: fixed;
+    bottom: 0;
+    z-index:200;
+}
+
+#leftButton {
+    height: 42px;
+    border-radius: 5px 0px 0px 5px;
+    text-align:center;
+    position: absolute;
+    top:0px;
+    left:0px;
+    z-index:100;
+}
+
+#rightButton {
+    height: 42px;
+    border-radius: 0px 5px 5px 0px;
+    text-align:center;
+    position: absolute;
+    top: 0px;
+    right:0px;
+    z-index:50;
+}
+
+.cardListImage {
+    max-height: 21px;
+    margin-right: 1px;
+    width: auto
+}
+
+.setImage {
+    position:absolute;
+    z-index: 10;
+    right: 30px;
+}
+
+.numInput {
+    width: 108px;
+}
+
+select {
+    height: 30px;
+}
+
+#legalTable {
+    margin-left:10%;
+}
+
+#clearBtn {
+    position: absolute;
+    margin-left:175px;
+    z-index:20;
+}
+
+.legalSelect {
+    width:118px;
+}
+
+.centerBox {
+    border-radius:20px;
+    box-shadow: 10px 10px 5px grey;
+    width:40%;
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 40px 40px 40px 40px
+}
+
+.content {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+html, body{
+overflow-y: scroll
+    height: 100%;
+}
+
+.shoeRemove {
+    position: absolute;
+    top: -134px;
+    right: -165px;
+    text-align: center;
+}
+
+.deckRemove {
+position: absolute;
+    top: -134px;
+    right: -15px;
+    text-align: center;
+}
+
+.shoePageRemove {
+position: absolute;
+top:-160px;
+right: -185px;
+    text-align: center;
+}
+
+
+.alertLink {
+    color: red;
+}
+
+.alertSpan {
+    text-align: center;
+    margin: auto;
+}
+
+#pageNav > a{
+    min-width:40px;
+}
+
+a:focus, a:active {
+    outline: none;
+}
+
+#colorContainer {
+    color: black;
+    background-color: #c6c6c6;
+    border-radius: 5px;
+}
+
+#colorContainer > label{
+    width: 74px;
+}
+
+.deckPie {
+    justify-self: end;
+}
+
+.deckName {
+    color: white;
+}
+
+#deckOptions {
+    color: black;
+    textAlign: center;
+    fontSize: 20px;
+}
+
+#headerInput {
+    padding-top:10px;
+    width:100%;
+}
+
+.deckColumns > div > button {
+    float: right;
+}
+
+.deckColumns:first-Child > div {
+    clear:both;
+}

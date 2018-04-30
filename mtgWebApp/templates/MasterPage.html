@@ -1,0 +1,95 @@
+﻿<!DOCTYPE html>
+
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+
+    <link rel="icon" href="{% static 'favicon.ico' %}" type="image/x-icon">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="{% static 'css/design.css' %}">
+    <link rel="stylesheet" href="{% static 'css/grids.css' %}">
+    <link rel="stylesheet" href="{% static 'css/snackBar.css' %}">
+    <link rel="stylesheet" href="{% static 'css/tooltip.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/octicons/4.4.0/font/octicons.css">
+    <title>MTG Deck Builder</title>
+</head>
+<body>
+
+    <nav class="navbar navbar-dark navbar-expand-md bg-dark" id="#nav-override">
+        <div class="container-fluid">
+            <a href="{% url 'home'%}" className="logo" onclick="clearSession()">
+                <img src="{% static 'logo.svg' %}" style="height:80px;" />
+            </a>
+            <ul class="navbar-nav" id="bootstrap-overrides">
+                <li class="navbar-item">
+                    <h2 style="color:white;">MTG Deck Builder</h2>
+                </li>
+            {% if user.is_authenticated %}
+                 <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle btn btn-dark" href="javascript:void(0)" id="navbarDropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        {{ user.get_username }}
+                    </a>
+                     <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                          <a class="dropdown-item" href="javascript:void(0)">Account</a>
+                         <a class="dropdown-item" href="{% url 'shoe_box' %}" >Shoe Box</a>
+                          <a class="dropdown-item" href="modal/"
+                            data-toggle="modal" data-target="#exampleModal">Decks</a>
+
+                    </div>
+                </li>
+                <li class="navbar-item">
+                    <a class="btn btn-danger" href="{% url 'logout'%}?next={% url 'home' %}">
+                        Log Out
+                    </a>
+                </li>
+
+
+                <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                    <div class="modal-dialog" role="document">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h5 class="modal-title" id="exampleModalLabel">Your Decks:</h5>
+                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                              <span aria-hidden="true">&times;</span>
+                            </button>
+                          </div>
+                        <div class="modal-body" id="modal">
+                            <!-- React DeckList -->
+                        </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            {% else %}
+                <li class="navbar-item">
+                    <a class="btn btn-primary"  href="{% url 'login'%}?next={{request.path}}">
+                        Login
+                    </a>
+                </li>
+            {% endif %}
+            </ul >
+        </div>
+    </nav>
+
+    <div class="jumbotron" id="master">
+        {% block content %}
+        {% endblock %}
+    </div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+<script src="{% static '/js/main.js' %}"></script>
+<script>
+    function clearSession() {
+        sessionStorage.clear();
+    }
+</script>
+</body>
+</html>

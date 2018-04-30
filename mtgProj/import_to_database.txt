@@ -1,0 +1,5 @@
+COPY card_table(card_name, mana_cost, converted_mana_Cost, types, card_text_mana,
+                   card_text, flavor_Text, watermark, loyalty, p, t, expansion, rarity,
+                   all_sets, card_number, artist, trans_card, other_sets, color_indicator,
+                   linked_card, hand_life, modern, legacy, vintage, commander, unsets, standard)
+FROM 'C:\Users\mikey\Documents\mtg\mtgProj\cards.csv' DELIMITER ',' CSV HEADER;

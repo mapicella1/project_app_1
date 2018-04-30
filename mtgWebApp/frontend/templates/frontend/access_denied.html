@@ -1,0 +1,10 @@
+{% extends 'MasterPage.html' %}
+{% load static %}
+
+{% block content %}
+<section class="section">
+      <div class="container">
+        <span>You are not authorized to view that page. Click <a href="{% url 'home'%}">here</a> to return home</span>
+      </div>
+</section>
+{% endblock %}

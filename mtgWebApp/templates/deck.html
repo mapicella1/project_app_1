@@ -1,0 +1,41 @@
+{% extends 'MasterPage.html' %}
+{% load static %}
+{% load titlefy %}
+{% block content %}
+
+    <div class="">
+        <ul>
+            <li><strong>Creatures</strong></li>
+            {% for value in cards %}
+                {% if 'Creature' in value.types %}
+                    <li>{{value.card_name}}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <ul>
+            <li><strong>Land</strong></li>
+            {% for value in cards %}
+                {% if 'Land' in value.types %}
+                    <li>{{value.card_name}}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <ul>
+            <li><strong>Enchant</strong></li>
+            {% for value in cards %}
+                {% if 'Enchant' in value.types %}
+                    <li>{{value.card_name}}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <ul>
+            <li><strong>Artifact</strong></li>
+            {% for value in cards %}
+                {% if 'Artifact' in value.types %}
+                    <li>{{value.card_name}}</li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    </div>
+
+{% endblock %}
