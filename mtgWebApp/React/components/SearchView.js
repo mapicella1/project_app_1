@@ -20,6 +20,7 @@ class SearchView extends Component {
             pages: 0,
             cardTotal: 0,
             display: [],
+            exclude: '',
         }
     }
 
@@ -29,8 +30,7 @@ class SearchView extends Component {
     // Clears all parameters, calls Toggle to clear all parameters
     clearParams = (e) => {
         e.preventDefault();
-        let clear = document.getElementById('clearBtn');
-        clear.hidden = true;
+        this.checkBtn.hidden = true;
         this.toggle.reset();
         this.setState({
             params: [],
@@ -57,6 +57,16 @@ class SearchView extends Component {
                 }
             });
         }
+    }
+
+    setExclude = (excludeFromChild) => {
+        let exclude = (excludeFromChild)
+                        ? ('&exclude=true')
+                        : ('')
+        console.log(exclude);
+        this.setState({
+            exclude: exclude
+        });
     }
 
     // builds query string parameters to be sent in ajax fetch url
@@ -89,11 +99,12 @@ class SearchView extends Component {
         sessionStorage.setItem('data', JSON.stringify(data));
     }
 
-    // ajax fetch to card search api
-    makeSearch(search, params, page) {
-        var cardTotal;
+    // ajax fetch to card search api ${exclude}
+    makeSearch(search, params, page, exclude) {
+        let checked = (this.exclude.checked) ? ('&exclude=true') : ('');
+        let cardTotal;
         if (search || params) {
-            callBackend(`api/cards/?page=${page}&search=${search}${params}`)
+            callBackend(`api/cards/?page=${page}${checked}&search=${search}${params}`)
                 .then(data => {
                     this.setStorage(page, data['session'], data)
                     this.setState({
@@ -128,7 +139,7 @@ class SearchView extends Component {
     setY = (y) => { if (this.table) this.table.setY(y); }
 
     // set clear button to visible or hidden
-    clearButton = (hide) => this.clearBtn.hidden = hide;
+    clearButton = (hide) => this.checkBtn.hidden = hide;
 
     // search on enter key pressed
     handleKeyPress(e) {
@@ -158,13 +169,24 @@ class SearchView extends Component {
                         </button>
                     </div>                    
                 </div>
+                <div hidden ref={(checkBtn) => { this.checkBtn = (checkBtn) }}>
+                    <button id="clearBtn" ref={(clear) => this.clearBtn = (clear)}
+                        onClick={this.clearParams.bind(this)}
+                        className="btn btn-danger">Clear</button>
 
-                <button hidden id="clearBtn" ref={(clear) => this.clearBtn = (clear)}
-                    onClick={this.clearParams.bind(this)}
-                    className="btn btn-danger">Clear</button>
-            
+                    <label className="colorCheck">
+                        <input type="checkbox" tabIndex="0" data-toggle="tooltip"
+                            ref={(exclude) => { this.exclude = (exclude) }}
+                        id="colorExclude" title="Exclude Unselected" />
+                        <span>
+                            Exclude unselected Colors
+                        </span>
+                    </label>
+                    
+                </div>
                 <Toggle ref={(child) => { this.toggle = child }} y={this.getY}
-                    setParams={this.setParams} clearButton={this.clearButton} />                
+                    setParams={this.setParams} setExclude={this.setExclude}
+                    clearButton={this.clearButton} />                
 
                 {/* wait for loaded to be true before rendering results in Table*/}
                 {(loaded) && (

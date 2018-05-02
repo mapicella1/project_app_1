@@ -8,3 +8,5 @@ Procfile
 Procfile.windows
 runtime.txt
 staticfiles/
+mtgWebApp/.git
+mtgWebApp/.gitignore

@@ -78,6 +78,8 @@ class AdvSearch extends Component {
         }
     }
 
+    setExclude = (excludeFromChild) => this.props.setExclude(excludeFromChild);
+
     // reset parameter object to initial, call TableRow to reset
     reset = () => {
         this.setState(this.initialState);
@@ -112,7 +114,7 @@ class AdvSearch extends Component {
             <div id="advGrid" className="advGrid">
                 {this.state.params.map((param) => {
                     return <TableRow ref={(child) => { this.tableRow = child }}
-                        key={shortid.generate()} param={param}
+                        key={shortid.generate()} param={param} setExclude={this.setExclude}
                         paramText={this.getParams} paramString={this.getPString} />
                 })}     
             </div>

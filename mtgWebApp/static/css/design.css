@@ -26,6 +26,19 @@ li{
     float:left;
 }
 
+.colorCheck {
+    border-color: 1px solid black;
+    border-radius: 5px;
+    position: absolute;
+    margin-left:250px;
+    margin-top: 7px;
+    z-index:20;
+}
+
+.colorCheck > input {
+    margin-right: 10px;
+}
+
 #nav-override {
     max-width:1055px;
     min-width:1050px;

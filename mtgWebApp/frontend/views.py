@@ -3,6 +3,7 @@ from random import randint
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
+from django.utils.datastructures import MultiValueDictKeyError
 from rest_framework import generics
 from rest_framework.response import Response
 from django.contrib.auth import login, authenticate
@@ -163,8 +164,7 @@ def eval_lt(card_nums, key, value):
     return id_array
 
 
-def build_query(card_nums, key, action, search_dict):
-
+def build_query(card_nums, key, action, search_dict, not_colors):
     filter = Q()
     for item in search_dict[key]:
         if key == 'p' or key == 't' or key == 'converted_mana_cost':
@@ -191,6 +191,16 @@ def build_query(card_nums, key, action, search_dict):
             else:
                 filter &= Q(**{key + '__icontains': item})
                 filter |= Q(**{'all_sets__icontains': item[1:]})
+        elif key == 'mana_cost':
+            if item[:1] is '!':
+                filter &= ~Q(**{key + '__icontains': item[1:]})
+            elif item[:1] is '|':
+                filter |= Q(**{key + '__icontains': item[1:]})
+            else:
+                filter &= Q(**{key + '__icontains': item})
+        elif key == 'exclude':
+            for color in not_colors:
+                filter &= ~Q(**{'mana_cost__contains': color})
         else:
             if item[:1] == '*':
                 filter &= Q(**{key + '__exact': item[1:]})
@@ -202,6 +212,21 @@ def build_query(card_nums, key, action, search_dict):
                 filter &= Q(**{key + '__icontains': item})
         return filter
 
+
+def get_colors(q_colors):
+    colors = ['Green', 'Red', 'Black', 'White', 'Blue']
+    for color in q_colors:
+        if color[:1] is '|':
+            color = color[1:]
+        elif color[:1] is '!':
+            continue
+        try:
+            colors.remove(color.capitalize())
+        except ValueError:
+            pass
+    return colors
+
+
 # main search query
 class GetCards(generics.ListCreateAPIView):
     def list(self, request, *args, **kwargs):
@@ -212,12 +237,11 @@ class GetCards(generics.ListCreateAPIView):
             'gt': eval_gt,
             'lt': eval_lt,
         }
-        not_colors = ['Green', 'Red', 'Black', 'White', 'Blue']
-        card_nums = get_num_cards()
 
+        card_nums = get_num_cards()
         get_query = request.GET
         search_dict = {}
-
+        not_colors = []
         # get keys from search request query and create those keys in the search_dict
         for key in get_query:
             # skip current loop if on 'page' or search' key
@@ -239,6 +263,13 @@ class GetCards(generics.ListCreateAPIView):
                             search_dict['all_sets'].append('|' + item)
                         search_dict[key] = []
                         search_dict[key] = result.split()
+                    elif key == 'exclude':
+                        try:
+                            search_dict[key] = [True]
+                            not_colors = get_colors(get_query['mana_cost'].split())
+                        except (MultiValueDictKeyError, KeyError):
+                            search_dict[key] = [True]
+                            not_colors = ['Green', 'Red', 'Black', 'White', 'Blue']
                     else:
                         search_dict[key] = []
                         search_dict[key] = result.split()
@@ -250,7 +281,7 @@ class GetCards(generics.ListCreateAPIView):
         for key in search_dict:
             if key in ('page', 'search', 'fmt', 'all_sets'):
                 continue
-            q_objects.add(build_query(card_nums, key, action, search_dict), q_objects.AND)
+            q_objects.add(build_query(card_nums, key, action, search_dict, not_colors), q_objects.AND)
 
         matching_cards = CardTable.objects.filter(q_objects).order_by('card_name').distinct('card_name')
         cards = CardSearchSerializer(matching_cards, many=True)

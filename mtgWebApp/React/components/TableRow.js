@@ -145,6 +145,13 @@ class TableRow extends Component {
         }
         return options;
     }
+
+    setExclude = () => {
+        console.log(this.exclude)
+        console.log(this.exclude.checked)
+        this.exclude.checked = !this.exclude.checked
+        this.props.setExclude(this.exclude.checked)
+    };
     
     render() {
         let categoryOptions = this.props.categories.map(category => {
@@ -168,15 +175,6 @@ class TableRow extends Component {
                 <tbody>
                     <tr className="advRow">
                             <td style={{ align: 'right' }}><label>{param.name}</label></td>
-                            {// --exclude unselected colors checkbox; removed until functional django code implemented
-                            //(this.isColor()) && 
-                            //    (<td>
-                            //    <span >
-                            //        <input type="checkbox" tabIndex="0" data-toggle="tooltip"
-                            //            id="colorExclude" title="Exclude Unselected" />
-                            //    </span>
-                            //</td>)
-                            }
                             <td>
                                 <select ref={(value) => { this.category = value }}>
                                     {(this.isFmt()) // populate select element based off of param type
