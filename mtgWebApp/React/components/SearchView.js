@@ -59,16 +59,6 @@ class SearchView extends Component {
         }
     }
 
-    setExclude = (excludeFromChild) => {
-        let exclude = (excludeFromChild)
-                        ? ('&exclude=true')
-                        : ('')
-        console.log(exclude);
-        this.setState({
-            exclude: exclude
-        });
-    }
-
     // builds query string parameters to be sent in ajax fetch url
     buildSearch() {
         let searchText = this.search.value;

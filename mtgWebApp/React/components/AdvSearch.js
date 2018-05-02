@@ -78,8 +78,6 @@ class AdvSearch extends Component {
         }
     }
 
-    setExclude = (excludeFromChild) => this.props.setExclude(excludeFromChild);
-
     // reset parameter object to initial, call TableRow to reset
     reset = () => {
         this.setState(this.initialState);

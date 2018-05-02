@@ -60,8 +60,6 @@ class Toggle extends React.Component {
         if (!this.paramDiv.firstChild) this.props.clearButton(true); // hide clear button if no parameters
     }
 
-    setExclude = (excludeFromChild) => this.props.setExclude(excludeFromChild);
-
     // sets AdvSearch to visible or hidden
     handleClick = () => {
         let tempBool = this.state.isOpened;

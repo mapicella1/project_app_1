@@ -145,13 +145,6 @@ class TableRow extends Component {
         }
         return options;
     }
-
-    setExclude = () => {
-        console.log(this.exclude)
-        console.log(this.exclude.checked)
-        this.exclude.checked = !this.exclude.checked
-        this.props.setExclude(this.exclude.checked)
-    };
     
     render() {
         let categoryOptions = this.props.categories.map(category => {
