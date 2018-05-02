@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import os
 import dj_database_url
 
@@ -175,7 +174,6 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 # db_from_env = dj_database_url.config()
 # DATABASES['default'].update(db_from_env)
 # DATABASES['default']['CONN_MAX_AGE'] = 500
-=======
 import os
 import dj_database_url
 
@@ -352,4 +350,3 @@ SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 # db_from_env = dj_database_url.config()
 # DATABASES['default'].update(db_from_env)
 # DATABASES['default']['CONN_MAX_AGE'] = 500
->>>>>>> 5f94b09ef3c3f6bc6e3e27c36cbae257f3dcce44

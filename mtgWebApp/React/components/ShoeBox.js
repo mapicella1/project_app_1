@@ -85,7 +85,6 @@ class ShoeBox extends Component {
 
     // sets currently dragged card
     dragCard = (e, id, name) => {
-        console.log(id, name);
         this.setState({ dragCard: [id, name] });
     };
 

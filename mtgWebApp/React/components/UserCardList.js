@@ -282,12 +282,15 @@ class UserCardList extends Component {
 
     // builds main grid of sidebar with array from getScrollCards
     cellRenderer = ({ columnIndex, key, rowIndex, style }) => {
-        let cardArray = this.getScrollCards();
-        return (
-            <div key={key} style={style}>
-                {cardArray[columnIndex][rowIndex]}
-            </div>
-        )
+        if (this.state.loaded) {
+            let cardArray = this.getScrollCards();
+            return (
+                <div key={key} style={style}>
+                    {cardArray[columnIndex][rowIndex]}
+                </div>
+            )
+        }
+        
     }
 
     // gets number of rows needed for main grid of sidebar -> halved type count rounded up
@@ -314,6 +317,7 @@ class UserCardList extends Component {
                 <div id="userCardInner" style={fix ? { top: '0' } : { top: y }} 
                     ref={(div) => { this.userInner = (div) }} className={fix ? 'floating' : ''}>
 
+                    {/* don't render graphs if shoe box is loaded*/}
                     {(deckName != 'Shoe Box' && data.length != 0) &&
                         (<GraphData ref={(graph) => { this.graphData = graph }}
                             chart="chart" doughChart="doughChart"/>)
@@ -359,7 +363,6 @@ class UserCardList extends Component {
 
                     <div onDragOver={(e) => this.onDragOver(e)} onDragEnter={(e) => this.onDragEnter(e)}
                         onDrop={(e) => this.onDrop(e, dragCard)} draggable="false">
-                        {(loaded) && (
                             <Grid
                                 cellRenderer={this.cellRenderer.bind(this)}
                                 columnCount={2}
@@ -369,7 +372,6 @@ class UserCardList extends Component {
                                 rowHeight={244}
                                 width={367}
                             />
-                        )}
                     </div>
                 </div>
                 <SnackBar ref={(value) => { this.snack = (value) }} />

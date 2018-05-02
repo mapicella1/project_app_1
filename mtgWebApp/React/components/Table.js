@@ -93,7 +93,9 @@ class Table extends Component {
     }
 
     // redirects to specific card page if only one result from search
-    goToCard = (card) => window.location.href = "/card/" + card.card_id;
+    goToCard = (card) => {
+        window.location.href = "/card/" + card.card_id;
+    };
 
     // render page numbers if more than one page
     getRenderedPages = (pages) => {

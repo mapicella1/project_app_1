@@ -163,6 +163,45 @@ def eval_lt(card_nums, key, value):
     return id_array
 
 
+def build_query(card_nums, key, action, search_dict):
+
+    filter = Q()
+    for item in search_dict[key]:
+        if key == 'p' or key == 't' or key == 'converted_mana_cost':
+            if item[:2] == '>=':
+                filter &= Q(**{'card_id__in': action.get('gte')(card_nums, key, int(item[2:]))})
+            elif item[:2] == '<=':
+                filter &= Q(**{'card_id__in': action.get('lte')(card_nums, key, int(item[2:]))})
+            elif item[:1] == '>':
+                filter &= Q(**{'card_id__in': action.get('gt')(card_nums, key, int(item[1:]))})
+            elif item[:1] == '<':
+                filter &= Q(**{'card_id__in': action.get('lt')(card_nums, key, int(item[1:]))})
+            else:
+                filter &= Q(**{key + '__icontains': item[1:]})
+        elif key == 'expansion':
+            if item[:1] == '*':
+                filter &= Q(**{key + '__exact': item[1:]})
+                filter |= Q(**{'all_sets__contains': item[1:]})
+            elif item[:1] is '!':
+                filter &= ~Q(**{key + '__icontains': item[1:]})
+                filter |= Q(**{'all_sets__icontains': item[1:]})
+            elif item[:1] is '|':
+                filter |= Q(**{key + '__icontains': item[1:]})
+                filter |= Q(**{'all_sets__icontains': item[1:]})
+            else:
+                filter &= Q(**{key + '__icontains': item})
+                filter |= Q(**{'all_sets__icontains': item[1:]})
+        else:
+            if item[:1] == '*':
+                filter &= Q(**{key + '__exact': item[1:]})
+            elif item[:1] is '!':
+                filter &= ~Q(**{key + '__exact': item[1:]})
+            elif item[:1] is '|':
+                filter |= Q(**{key + '__icontains': item[1:]})
+            else:
+                filter &= Q(**{key + '__icontains': item})
+        return filter
+
 # main search query
 class GetCards(generics.ListCreateAPIView):
     def list(self, request, *args, **kwargs):
@@ -178,9 +217,6 @@ class GetCards(generics.ListCreateAPIView):
 
         get_query = request.GET
         search_dict = {}
-        include_dict = {}
-        exclude_dict = {}
-        or_dict = {}
 
         # get keys from search request query and create those keys in the search_dict
         for key in get_query:
@@ -207,80 +243,16 @@ class GetCards(generics.ListCreateAPIView):
                         search_dict[key] = []
                         search_dict[key] = result.split()
 
-        # populate include, exclude, and or dicts from search_dict base
-        # off of their leading characters: '!', '|', or ''
-        for key, value in search_dict.items():
-            if key in ('page', 'search', 'fmt'):
-                continue
-            if value:
-                include_dict[key] = []
-                exclude_dict[key] = []
-                or_dict[key] = []
-                for item in value:
-                    if item[:1] is '!':
-                        exclude_dict[key].append(item[1:])
-                    elif item[:1] is '|':
-                        or_dict[key].append(item[1:])
-                    else:
-                        include_dict[key].append(item)
-
         # get value of main search bar on homepage
         search = get_query['search']
-        my_filter = Q(card_name__icontains=search)
+        q_objects = Q(card_name__icontains=search)
 
-        # create Q objects for each key in respective dict
-        for key in or_dict:
-            for item in or_dict[key]:
-                if key in ('p', 't', 'converted_mana_cost'):
-                    if item[:2] == '>=':
-                        my_filter |= Q(**{key + '__gte': int(item[2:])})
-                    elif item[:2] == '<=':
-                        my_filter |= Q(**{key + '__lte': int(item[2:])})
-                    elif item[:2] == '>':
-                        my_filter |= Q(**{key + '__gt': int(item[1:])})
-                    elif item[:2] == '<':
-                        my_filter |= Q(**{key + '__lt': int(item[1:])})
-                    else:
-                        my_filter |= Q(**{key + '__icontains': item[1:]})
-                else:
-                    my_filter |= Q(**{key+'__icontains': item})
+        for key in search_dict:
+            if key in ('page', 'search', 'fmt', 'all_sets'):
+                continue
+            q_objects.add(build_query(card_nums, key, action, search_dict), q_objects.AND)
 
-        for key in include_dict:
-            for item in include_dict[key]:
-                if key == 'p' or key == 't' or key == 'converted_mana_cost':
-                    if item[:2] == '>=':
-                        my_filter &= Q(**{'card_id__in': action.get('gte')(card_nums, key, int(item[2:]))})
-                    elif item[:2] == '<=':
-                        my_filter &= Q(**{'card_id__in': action.get('lte')(card_nums, key, int(item[2:]))})
-                    elif item[:1] == '>':
-                        my_filter &= Q(**{'card_id__in': action.get('gt')(card_nums, key, int(item[1:]))})
-                    elif item[:1] == '<':
-                        my_filter &= Q(**{'card_id__in': action.get('lt')(card_nums, key, int(item[1:]))})
-                    else:
-                        my_filter &= Q(**{key + '__icontains': item[1:]})
-                else:
-                    if item[:1] == '*':
-                        my_filter &= Q(**{key + '__exact': item[1:]})
-                    else:
-                        my_filter &= Q(**{key+'__icontains': item})
-
-        for key in exclude_dict:
-            for item in exclude_dict[key]:
-                if key in ('p', 't', 'converted_mana_cost'):
-                    if item[:2] == '>=':
-                        my_filter &= ~Q(**{key + '__gte': int(item[2:])})
-                    elif item[:2] == '<=':
-                        my_filter &= ~Q(**{key + '__lte': int(item[2:])})
-                    elif item[:1] == '>':
-                        my_filter &= ~Q(**{key + '__gt': int(item[1:])})
-                    elif item[:1] == '<':
-                        my_filter &= ~Q(**{key + '__lt': int(item[1:])})
-                    else:
-                        my_filter &= ~Q(**{key + '__exact': item[1:]})
-                else:
-                    my_filter &= ~Q(**{key+'__icontains': item})
-
-        matching_cards = CardTable.objects.filter(my_filter).order_by('card_name').distinct('card_name')
+        matching_cards = CardTable.objects.filter(q_objects).order_by('card_name').distinct('card_name')
         cards = CardSearchSerializer(matching_cards, many=True)
 
         # pagination of data by 100 cards per page

@@ -148,7 +148,7 @@ class Card extends Component {
             array.push(<i key={shortid.generate()} >{value}</i>)
         }
         else if (key == 'p') {
-            array.push(<span key={shortid.generate()} >{`${value.trim()}/${crd.t.trim()}`}</span>)
+            array.push(<span key={shortid.generate()} >{`${value.trim()}/${card.t.trim()}`}</span>)
         }
         else if (key == 'expansion') {
             // replace 'Basic Land' rarity with 'Land' for correct image name match
