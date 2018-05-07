@@ -200,23 +200,27 @@ class ShoeBox extends Component {
         )
     }
 
+    setAllColors = (allBtn) => {
+        allBtn.className = "btn btn-outline-warning active btn-sm"
+        // reset activeColors object, show all cards
+        this.setState({ activeColors: { ...this.props.activeColors } });
+        this.state.cards.map((card) => {
+            let cardLink = document.getElementById(card.card_id);
+            cardLink.hidden = false;
+        });
+        // deactivate color buttons
+        colors.map((color) => {
+            let colorBtn = document.getElementById(color + 'Btn');
+            this.setButton(colorBtn);
+        });
+    }
+
     // checks color of clicked button
     showColors(e, color) {
         e.preventDefault();
         let allBtn = this.allColorBtn;
         if (color == 'all') {
-            allBtn.className = "btn btn-outline-warning active btn-sm"
-            // reset activeColors object, show all cards
-            this.setState({ activeColors: { ...this.props.activeColors } });
-            this.state.cards.map((card) => {
-                let cardLink = document.getElementById(card.card_id);
-                cardLink.hidden = false;
-            });
-            // deactivate color buttons
-            colors.map((color) => {
-                let colorBtn = document.getElementById(color + 'Btn');
-                this.setButton(colorBtn);
-            });
+            this.setAllColors(allBtn);
         }
         else {
             // deactivate allBtn
@@ -242,65 +246,52 @@ class ShoeBox extends Component {
             this.state.cards.map((card) => {
                 this.setColors(activeColors, card);
             })
+            // check if all color buttons are inactive
+            let checkActive = Object.keys(activeColors).filter(key => {
+                return activeColors[key] == true;
+            });
+            // set all colors visible if no active colors
+            if (!checkActive.length) {
+                this.setAllColors(allBtn);
+            }
         }
     }
 
     // set button to inactive
     setButton = (button) => button.className = button.className.replace('active', '');
 
-    // set visibility of card to matching color button
-    checkCardHidden = (activeColors, key, cardLink) => {
-        if (activeColors[key] == true) {
-            cardLink.hidden = !activeColors[key];
-            return false;
-        }
-        else {
-            cardLink.hidden = !activeColors[key];
-            return true;
-        }
-    }
-
     // iterate through active colors and assign card visibility if they match
     setColors = (activeColors, card) => {
         let counter = 0;
         let cardLink = document.getElementById(card.card_id);
-        let cardColors = Object.keys(activeColors).find((key) => {
+        let cardColors = Object.keys(activeColors).filter((key) => {
             // assign card visibility to colorless if not mana cost
             if (!card.mana_cost && !card.color_indicator) {
-                let hidden = this.checkCardHidden(activeColors, 'Colorless', cardLink)
-                if (!hidden) {
-                    return 'land';
-                }
+                return activeColors['Colorless'];
             }
             // assign card visibility to color button if color indicator matches active color button
             else if (card.color_indicator && card.color_indicator.includes(key)) {
-                let hidden = this.checkCardHidden(activeColors, key, cardLink)
-                if (!hidden) {
-                    return 'trans';
-                }
+                return activeColors[key];
             }
             // assign card visibility if active color button exists in mana cost or rules text
             // exclude cards with color indicator 
-            else if (!card.color_indicator && key != 'Colorless' && (card.mana_cost.includes(key) || (card.card_text && card.card_text.includes("{" + key + "}")))) {
-                let hidden = this.checkCardHidden(activeColors, key, cardLink)
-                if (card.subtypes == 'God') {
-                    console.log(card.mana_cost, activeColors[color])
-                }
-                if (!hidden) {
-                    return 'colored';
-                }
+            else if (!card.color_indicator && key != 'Colorless' && (card.mana_cost.includes(key)
+                    || (card.card_text && card.card_text.includes("{" + key + "}")))) {
+                return activeColors[key];
             }
-            // assign non-creature non-enchantment artifacts to colorless button
-            else if (multiTypeCheck('Artifact', card)) {
-                let hidden = this.checkCardHidden(activeColors, 'Colorless', cardLink)
-                if (!hidden) {
-                    return 'artifact';
-                }
-            }
+            // increment counter if no match
             else {
                 counter += 1;
             }
         })
+
+        // if cardColors is empty, hide card
+        if (!cardColors.length) {
+            cardLink.hidden = true;
+        }
+        else {
+            cardLink.hidden = false;
+        }
         // if card didn't match any of previous checks, assign visibility to colorless button
         if (counter == 6) {
             cardLink.hidden = !activeColors['Colorless'];
